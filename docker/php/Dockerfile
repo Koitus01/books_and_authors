@@ -31,7 +31,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-install pdo_mysql
 # Install extensions
-RUN docker-php-ext-install zip exif pcntl
+RUN docker-php-ext-install pdo_mysql zip exif pcntl
 
 # Install xdebug
 RUN pecl install xdebug-3.1.5 \
