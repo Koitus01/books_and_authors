@@ -7,8 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[Index(columns: ["isbn"], name: "isbn")]
+#[Index(columns: ["publishing"], name: "publishing")]
 class Book
 {
     #[ORM\Id]
@@ -30,6 +33,9 @@ class Book
 
     #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books')]
     private Collection $authors;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cover;
 
     public function __construct()
     {
@@ -114,5 +120,15 @@ class Book
         }
 
         return $this;
+    }
+
+    public function getCover(): string
+    {
+        return $this->cover;
+    }
+
+    public function setCover(string $cover): void
+    {
+        $this->cover = $cover;
     }
 }

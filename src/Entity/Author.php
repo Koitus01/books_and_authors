@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
+#[ORM\UniqueConstraint(
+    name: 'author_first_name_second_name_third_name_uindex',
+    columns: ['first_name', 'second_name', 'third_name']
+)]
 class Author
 {
     #[ORM\Id]
