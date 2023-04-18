@@ -33,7 +33,7 @@ class DeleteBookTest extends BaseIntegration
         $db = $this->container->get(DeleteBook::class);
         $manager = $this->doctrine->getManager();
         $author = new Author();
-        $author->setFirstName('Viktor')->setSecondName('Hugo');
+        $author->setFirstName($this->firstname())->setSecondName($this->secondName());
         $this->doctrine->getManager()->persist($author);
         $this->doctrine->getManager()->flush();
         $book = new Book();

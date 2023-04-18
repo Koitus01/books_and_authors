@@ -39,14 +39,14 @@ class CreateBook extends BaseUseCase
             'title' => $DTO->title
         ]);
         if ($sameTitleAndISBNBook) {
-            throw new DuplicateBookException('Book with same ISBN and title already exists');
+            throw DuplicateBookException::sameISBN();
         }
         $sameTitleAndPublishingBook = $bookRepository->findBy([
             'publishing' => $DTO->publishing->value(),
             'title' => $DTO->title
         ]);
         if ($sameTitleAndPublishingBook) {
-            throw new DuplicateBookException('Book with same publishing date and title already exists');
+            throw DuplicateBookException::samePublishing();
         }
 
         $book = new Book();

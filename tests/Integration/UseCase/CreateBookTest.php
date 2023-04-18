@@ -30,7 +30,7 @@ class CreateBookTest extends BaseIntegration
     public function testExecuteExistingIsbnAndTitleWillThrow()
     {
         $this->expectException(DuplicateBookException::class);
-        $this->expectExceptionMessage('Book with same ISBN and title already exists');
+        $this->expectExceptionMessage(DuplicateBookException::SAME_ISBN_ERROR);
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
         $cbDTO = new CreateBookDTO($this->title(), $this->publishing(), $this->ISBN());
@@ -43,7 +43,7 @@ class CreateBookTest extends BaseIntegration
     public function testExecuteExistingYearAndTitleWillThrow()
     {
         $this->expectException(DuplicateBookException::class);
-        $this->expectExceptionMessage('Book with same publishing date and title already exists');
+        $this->expectExceptionMessage(DuplicateBookException::SAME_PUBLISHING_ERROR);
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
         $cbDTO = new CreateBookDTO($this->title(), $this->publishing(), $this->ISBN());
@@ -62,7 +62,7 @@ class CreateBookTest extends BaseIntegration
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
         $author = new Author();
-        $author->setFirstName('Viktor')->setSecondName('Hugo');
+        $author->setFirstName($this->firstname())->setSecondName($this->secondName());
         $this->doctrine->getManager()->persist($author);
         $this->doctrine->getManager()->flush();
         $authors = new ArrayCollection([$author]);
@@ -87,7 +87,7 @@ class CreateBookTest extends BaseIntegration
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
         $author = new Author();
-        $author->setFirstName('Viktor')->setSecondName('Hugo');
+        $author->setFirstName($this->firstname())->setSecondName($this->secondName());
         $authors = new ArrayCollection([$author]);
         $cbDTO = new CreateBookDTO(
             $this->title(),

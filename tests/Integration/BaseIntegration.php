@@ -2,6 +2,8 @@
 
 namespace App\Tests\Integration;
 
+use App\Entity\Author;
+use App\Entity\Book;
 use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,6 +25,25 @@ abstract class BaseIntegration extends KernelTestCase
         $this->container = static::getContainer();
 	}
 
+    protected function createFullLesMiserables(): Book
+    {
+        $manager = $this->doctrine->getManager();
+        $author = new Author();
+        $author->setFirstName($this->firstname())->setSecondName($this->secondName());
+        $book = new Book();
+        $book
+            ->setTitle($this->title())
+            ->setIsbn($this->ISBN())
+            ->setPublishing($this->publishing())
+            ->addAuthor($author);
+        $manager->persist($author);
+        $manager->persist($book);
+        $manager->flush();
+        $manager->clear();
+
+        return $book;
+    }
+
     protected static function title(): string
     {
         return "Les Miserables";
@@ -36,5 +57,15 @@ abstract class BaseIntegration extends KernelTestCase
     protected static function publishing(): Publishing
     {
         return Publishing::fromScalar('1862');
+    }
+
+    protected static function firstName(): string
+    {
+        return 'Viktor';
+    }
+
+    protected static function secondName(): string
+    {
+        return 'Hugo';
     }
 }

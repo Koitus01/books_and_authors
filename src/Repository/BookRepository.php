@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Book;
+use App\ValueObject\ISBN;
+use App\ValueObject\Publishing;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,6 +39,22 @@ class BookRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function isExistsByParams(string $title, ISBN $isbn = null, Publishing $publishing = null): bool
+    {
+        $criteria = ['title' => $title];
+
+        if ($isbn) {
+            $criteria['isbn'] = $isbn->value();
+        }
+
+        if ($publishing) {
+            $criteria['publishing'] = $publishing->value();
+        }
+
+        return (bool)$this->findOneBy($criteria);
+
     }
 
 //    /**
