@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\BookRepository;
+use App\ValueObject\Publishing;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -59,14 +60,14 @@ class Book
         return $this;
     }
 
-    public function getPublishing(): ?\DateTimeInterface
+    public function getPublishing(): Publishing
     {
-        return $this->publishing;
+        return new Publishing($this->publishing);
     }
 
-    public function setPublishing(\DateTimeInterface $publishing): self
+    public function setPublishing(Publishing $publishing): self
     {
-        $this->publishing = $publishing;
+        $this->publishing = $publishing->value();
 
         return $this;
     }
@@ -122,12 +123,12 @@ class Book
         return $this;
     }
 
-    public function getCover(): string
+    public function getCover(): ?string
     {
         return $this->cover;
     }
 
-    public function setCover(string $cover): void
+    public function setCover(?string $cover): void
     {
         $this->cover = $cover;
     }

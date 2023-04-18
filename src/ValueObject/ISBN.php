@@ -29,6 +29,7 @@ class ISBN
     }
 
     /**
+     * @see https://regex101.com/r/xz4JqR/9
      * @throws InvalidISBNException
      */
     private static function validate(string $isbn): void
