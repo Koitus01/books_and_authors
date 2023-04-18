@@ -5,6 +5,7 @@ namespace App\UseCase;
 use App\DTO\CreateBookDTO;
 use App\Entity\Book;
 use App\Exceptions\DuplicateBookException;
+use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Lock\LockFactory;
 
@@ -33,19 +34,12 @@ class CreateBook extends BaseUseCase
         $lock = $this->factory->createLock(str_replace(' ', '', $DTO->title));
         $lock->acquire(true);
 
+        /** @var BookRepository $bookRepository */
         $bookRepository = $this->entityManager->getRepository(Book::class);
-        $sameTitleAndISBNBook = $bookRepository->findBy([
-            'isbn' => $DTO->isbn->value(),
-            'title' => $DTO->title
-        ]);
-        if ($sameTitleAndISBNBook) {
+        if ($bookRepository->isExistsByParams($DTO->title, $DTO->isbn)) {
             throw DuplicateBookException::sameISBN();
         }
-        $sameTitleAndPublishingBook = $bookRepository->findBy([
-            'publishing' => $DTO->publishing->value(),
-            'title' => $DTO->title
-        ]);
-        if ($sameTitleAndPublishingBook) {
+        if ($bookRepository->isExistsByParams(title: $DTO->title, publishing: $DTO->publishing)) {
             throw DuplicateBookException::samePublishing();
         }
 

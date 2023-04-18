@@ -27,7 +27,11 @@ class UpdateBook extends BaseUseCase
 
         try {
             if ($DTO->title && $DTO->isbn && $repository->isExistsByParams($DTO->title, $DTO->isbn)) {
-                throw new DuplicateBookException('Book with same');
+                throw DuplicateBookException::sameISBN();
+            }
+
+            if ($DTO->title && $DTO->publishing && $repository->isExistsByParams(title: $DTO->title, publishing: $DTO->publishing)) {
+                throw DuplicateBookException::samePublishing();
             }
 
             if ($DTO->title) {
