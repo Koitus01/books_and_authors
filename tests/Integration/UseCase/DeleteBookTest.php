@@ -11,7 +11,7 @@ class DeleteBookTest extends BaseIntegration
 {
     public function testExecute()
     {
-        /** @var DeleteBook $cb */
+        /** @var DeleteBook $db */
         $db = $this->container->get(DeleteBook::class);
         $manager = $this->doctrine->getManager();
         $book = new Book();
@@ -29,7 +29,7 @@ class DeleteBookTest extends BaseIntegration
     public function testExecuteNonExistentWillThrow()
     {
         $this->expectException(EntityNotFoundException::class);
-        /** @var DeleteBook $cb */
+        /** @var DeleteBook $db */
         $db = $this->container->get(DeleteBook::class);
         $db->execute(1);
     }

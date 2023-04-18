@@ -3,18 +3,10 @@
 namespace App\UseCase;
 
 use App\Entity\Book;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 
-class DeleteBook
+class DeleteBook extends BaseUseCase
 {
-    protected EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     /**
      * @throws EntityNotFoundException
      */

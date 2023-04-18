@@ -5,17 +5,9 @@ namespace App\UseCase;
 use App\DTO\CreateBookDTO;
 use App\Entity\Book;
 use App\Exceptions\DuplicateBookException;
-use Doctrine\ORM\EntityManagerInterface;
 
-class CreateBook
+class CreateBook extends BaseUseCase
 {
-    protected EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     /**
      * TODO: create authors here???
      * @throws DuplicateBookException
