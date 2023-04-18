@@ -12,9 +12,9 @@ class PublishingTest extends TestCase
     {
         $now = new \DateTime();
 
-        $p1 = new Publishing(1281);
-        $p2 = new Publishing("1925");
-        $p3 = new Publishing($now);
+        $p1 = Publishing::fromScalar(1281);
+        $p2 = Publishing::fromScalar("1925");
+        $p3 = Publishing::fromDatetime($now);
         $now->setDate($now->format('Y'), 1, 1);
         $now->setTime(0, 0);
 
@@ -29,7 +29,7 @@ class PublishingTest extends TestCase
     public function testIncorrectYearWillThrow($year)
     {
         $this->expectException(ParsePublishingYearException::class);
-        new Publishing($year);
+        Publishing::fromScalar($year);
     }
 
     public function incorrectYear()

@@ -35,7 +35,7 @@ class CreateBookTest extends BaseIntegration
         $cbDTO = new CreateBookDTO($this->title(), $this->publishing(), $this->ISBN());
         $cb->execute($cbDTO);
 
-        $cbDTO = new CreateBookDTO($this->title(), new Publishing('1234'), $this->ISBN());
+        $cbDTO = new CreateBookDTO($this->title(), Publishing::fromScalar('1234'), $this->ISBN());
         $cb->execute($cbDTO);
     }
 
@@ -84,8 +84,8 @@ class CreateBookTest extends BaseIntegration
         return ISBN::fromString('978-5-04-106865-3');
     }
 
-    private static function publishing()
+    private static function publishing(): Publishing
     {
-        return new Publishing('1862');
+        return Publishing::fromScalar('1862');
     }
 }

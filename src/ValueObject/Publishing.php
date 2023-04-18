@@ -11,26 +11,39 @@ class Publishing
 {
     private readonly DateTimeInterface $publishing;
 
+    private function __construct(DateTimeInterface $publishing)
+    {
+        $this->publishing = $publishing;
+    }
+
     /**
-     * @param string|int|DateTimeInterface $year — standard year, beginning from 1, or DateTime object
+     * @param string|int $year — standard year, beginning from 1
      * @throws ParsePublishingYearException
      */
-    public function __construct(string|int|DateTimeInterface $year)
+    public static function fromScalar(string|int $year): self
     {
-        if ($year instanceof DateTimeInterface) {
-            $this->publishing = $year;
-        } else {
-            try {
-                $this->publishing = new DateTime("first day of January " . $year);
-            } catch (Exception) {
-                throw new ParsePublishingYearException("Cannot properly parse year $year");
+        try {
+            $publishing = new DateTime("first day of January " . $year);
+            if ((string)$year !== $publishing->format('Y')) {
+                throw new Exception();
             }
-        }
-        $this->publishing->setTime(0, 0, 0);
-
-        if (is_scalar($year) && (string)$year !== $this->publishing->format('Y')) {
+        } catch (Exception) {
             throw new ParsePublishingYearException("Cannot properly parse year $year");
         }
+
+        return new self($publishing);
+    }
+
+    /**
+     * @param DateTimeInterface $publishing
+     * @return Publishing
+     */
+    public static function fromDatetime(DateTimeInterface $publishing): self
+    {
+        $publishing->setDate($publishing->format('Y'), 1, 1);
+        $publishing->setTime(0, 0);
+
+        return new self($publishing);
     }
 
     public function value(): DateTimeInterface

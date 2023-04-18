@@ -62,7 +62,7 @@ class Book
 
     public function getPublishing(): Publishing
     {
-        return new Publishing($this->publishing);
+        return Publishing::fromDatetime($this->publishing);
     }
 
     public function setPublishing(Publishing $publishing): self
