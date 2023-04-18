@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\Collection;
 
 class CreateBookDTO
 {
-    public readonly ArrayCollection $authors;
+    public readonly Collection $authors;
 
     /**
      * @param string $title
@@ -32,6 +32,8 @@ class CreateBookDTO
     {
         if (!$authors) {
             $this->authors = new ArrayCollection();
+        } else {
+            $this->authors = $authors;
         }
     }
 }

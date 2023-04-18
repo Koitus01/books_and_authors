@@ -30,7 +30,7 @@ class CreateBook
             throw new DuplicateBookException('Book with same ISBN and title already exists');
         }
         $sameTitleAndPublishingBook = $bookRepository->findBy([
-            'publishing' => $DTO->publishing,
+            'publishing' => $DTO->publishing->value(),
             'title' => $DTO->title
         ]);
         if ($sameTitleAndPublishingBook) {

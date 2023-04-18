@@ -53,6 +53,7 @@
         }
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^7.2",
         "symfony/test-pack": "^1.1"
     }
 }

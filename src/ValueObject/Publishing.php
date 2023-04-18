@@ -12,7 +12,7 @@ class Publishing
     private readonly DateTimeInterface $publishing;
 
     /**
-     * @param string|int|DateTimeInterface $year — standard year like 1898 or 2023 or DateTime object
+     * @param string|int|DateTimeInterface $year — standard year, beginning from 1, or DateTime object
      * @throws ParsePublishingYearException
      */
     public function __construct(string|int|DateTimeInterface $year)
