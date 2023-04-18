@@ -3,13 +3,14 @@
 namespace App\Tests\Integration\UseCase;
 
 use App\DTO\CreateBookDTO;
+use App\Entity\Author;
 use App\Exceptions\DuplicateBookException;
 use App\Tests\Integration\BaseIntegration;
 use App\UseCase\CreateBook;
-use App\ValueObject\AuthorName;
 use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\ORMInvalidArgumentException;
 
 class CreateBookTest extends BaseIntegration
 {
@@ -56,15 +57,20 @@ class CreateBookTest extends BaseIntegration
         $cb->execute($cbDTO);
     }
 
-    public function testExecuteWithNonExistentAuthors()
+    public function testExecuteWithAuthor()
     {
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
+        $author = new Author();
+        $author->setFirstName('Viktor')->setSecondName('Hugo');
+        $this->doctrine->getManager()->persist($author);
+        $this->doctrine->getManager()->flush();
+        $authors = new ArrayCollection([$author]);
         $cbDTO = new CreateBookDTO(
             $this->title(),
             $this->publishing(),
             $this->ISBN(),
-            new ArrayCollection([new AuthorName('aaa', 'bbb')]),
+            $authors,
         );
 
         $result = $cb->execute($cbDTO);
@@ -72,6 +78,25 @@ class CreateBookTest extends BaseIntegration
         $this->assertEquals($this->title(), $result->getTitle());
         $this->assertEquals($this->publishing(), $result->getPublishing());
         $this->assertEquals($this->ISBN()->value(), $result->getISBN());
+        $this->assertEquals($author, $result->getAuthors()->first());
+    }
+
+    public function testExecuteWithNonExistentAuthorWillThrow()
+    {
+        $this->expectException(ORMInvalidArgumentException::class);
+        /** @var CreateBook $cb */
+        $cb = $this->container->get(CreateBook::class);
+        $author = new Author();
+        $author->setFirstName('Viktor')->setSecondName('Hugo');
+        $authors = new ArrayCollection([$author]);
+        $cbDTO = new CreateBookDTO(
+            $this->title(),
+            $this->publishing(),
+            $this->ISBN(),
+            $authors,
+        );
+
+        $cb->execute($cbDTO);
     }
 
     private static function title(): string

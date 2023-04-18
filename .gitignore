@@ -9,3 +9,5 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+/.phpunit.result.cache
