@@ -20,7 +20,7 @@ final class Version20230418121917 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE book ADD cover VARCHAR(255) DEFAULT NULL, CHANGE name title LONGTEXT NOT NULL');
+        $this->addSql('ALTER TABLE book ADD cover VARCHAR(255) DEFAULT NULL');
         $this->addSql('CREATE INDEX isbn ON book (isbn)');
         $this->addSql('CREATE INDEX publishing ON book (publishing)');
     }
