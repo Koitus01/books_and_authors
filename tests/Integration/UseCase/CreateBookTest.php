@@ -98,19 +98,4 @@ class CreateBookTest extends BaseIntegration
 
         $cb->execute($cbDTO);
     }
-
-    private static function title(): string
-    {
-        return "Les Miserables";
-    }
-
-    private static function ISBN(): ISBN
-    {
-        return ISBN::fromString('978-5-04-106865-3');
-    }
-
-    private static function publishing(): Publishing
-    {
-        return Publishing::fromScalar('1862');
-    }
 }
