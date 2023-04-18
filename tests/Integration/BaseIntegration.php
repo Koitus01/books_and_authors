@@ -13,19 +13,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class BaseIntegration extends KernelTestCase
 {
-	protected ManagerRegistry $doctrine;
+    protected ManagerRegistry $doctrine;
     protected ContainerInterface|Container $container;
 
-	protected function setUp(): void
-	{
-		$kernel = self::bootKernel();
+    protected function setUp(): void
+    {
+        $kernel = self::bootKernel();
 
-		$this->doctrine = $kernel->getContainer()
-			->get( 'doctrine' );
+        $this->doctrine = $kernel->getContainer()
+            ->get('doctrine');
         $this->container = static::getContainer();
-	}
+    }
 
-    protected function createFullLesMiserables(): Book
+    protected function createLesMiserables(): Book
     {
         $manager = $this->doctrine->getManager();
         $author = new Author();
@@ -35,7 +35,8 @@ abstract class BaseIntegration extends KernelTestCase
             ->setTitle($this->title())
             ->setIsbn($this->ISBN())
             ->setPublishing($this->publishing())
-            ->addAuthor($author);
+            ->addAuthor($author)
+            ->setPagesCount(1462);
         $manager->persist($author);
         $manager->persist($book);
         $manager->flush();

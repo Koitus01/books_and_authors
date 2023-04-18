@@ -13,7 +13,7 @@ class UpdateBookDTO
         public readonly ?string     $title = null,
         public readonly ?Publishing $publishing = null,
         public readonly ?ISBN       $isbn = null,
-        ?Collection                 $authors = null,
+        public readonly ?Collection $authors = null,
         public readonly ?int        $pages_count = null,
         public readonly ?string     $cover = null,
     )

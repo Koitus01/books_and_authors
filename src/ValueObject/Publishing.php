@@ -17,7 +17,7 @@ class Publishing
     }
 
     /**
-     * @param string|int $year — standard year, beginning from 1
+     * @param string|int $year — standard year, beginning from 1000
      * @throws ParsePublishingYearException
      */
     public static function fromScalar(string|int $year): self
@@ -27,7 +27,7 @@ class Publishing
             if ((string)$year !== $publishing->format('Y')) {
                 throw new Exception();
             }
-        } catch (Exception) {
+        } catch (Exception $exception) {
             throw new ParsePublishingYearException("Cannot properly parse year $year");
         }
 

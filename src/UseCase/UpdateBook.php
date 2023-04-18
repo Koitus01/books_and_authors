@@ -13,7 +13,6 @@ use Throwable;
 class UpdateBook extends BaseUseCase
 {
     /**
-     * TODO: locks?
      * @param UpdateBookDTO $DTO
      * @return Book
      * @throws Throwable
@@ -29,7 +28,6 @@ class UpdateBook extends BaseUseCase
             if ($DTO->title && $DTO->isbn && $repository->isExistsByParams($DTO->title, $DTO->isbn)) {
                 throw DuplicateBookException::sameISBN();
             }
-
             if ($DTO->title && $DTO->publishing && $repository->isExistsByParams(title: $DTO->title, publishing: $DTO->publishing)) {
                 throw DuplicateBookException::samePublishing();
             }
@@ -37,16 +35,31 @@ class UpdateBook extends BaseUseCase
             if ($DTO->title) {
                 $book->setTitle($DTO->title);
             }
-
             if ($DTO->publishing) {
                 $book->setPublishing($DTO->publishing);
             }
-
             if ($DTO->isbn) {
+                $book->setIsbn($DTO->isbn);
+            }
+            if ($DTO->pages_count) {
+                $book->setPagesCount($DTO->pages_count);
+            }
+            if ($DTO->cover) {
+                $book->setCover($DTO->cover);
+            }
+            if ($DTO->authors) {
+                // replacing all old authors with new
+                foreach ($book->getAuthors() as $author) {
+                    $book->removeAuthor($author);
+                }
+                foreach ($DTO->authors as $author) {
+                    $book->addAuthor($author);
+                }
             }
 
-            $this->entityManager->commit();
+            $this->entityManager->persist($book);
 
+            $this->entityManager->commit();
             return $book;
         } catch (Throwable $e) {
             $this->entityManager->rollback();
