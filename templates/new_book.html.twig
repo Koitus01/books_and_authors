@@ -8,6 +8,7 @@
             const collectionHolder = document.querySelector('#book_authors');
 
             const item = document.createElement('li');
+            const index = collectionHolder.getElementsByTagName('li').length;
 
             item.innerHTML = collectionHolder
                 .dataset
@@ -15,6 +16,10 @@
                 .replace(
                     /__name__label__/g,
                     'ФИО'
+                )
+                .replaceAll(
+                    '[__name__]',
+                    '[' + index + ']'
                 );
 
             collectionHolder.appendChild(item);
@@ -76,7 +81,7 @@
         }
 
         li {
-            list-style:none;
+            list-style: none;
             margin-bottom: 15px;
         }
 
