@@ -19,6 +19,7 @@ class UpdateBook extends BaseUseCase
      */
     public function execute(UpdateBookDTO $DTO): Book
     {
+        //TODO: move transaction to outside?
         $this->entityManager->beginTransaction();
         /** @var BookRepository $repository */
         $repository = $this->entityManager->getRepository(Book::class);
@@ -58,7 +59,7 @@ class UpdateBook extends BaseUseCase
             }
 
             $this->entityManager->persist($book);
-
+            $this->entityManager->flush();
             $this->entityManager->commit();
             return $book;
         } catch (Throwable $e) {
