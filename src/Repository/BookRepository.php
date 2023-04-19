@@ -6,6 +6,7 @@ use App\Entity\Book;
 use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -55,6 +56,18 @@ class BookRepository extends ServiceEntityRepository
 
         return (bool)$this->findOneBy($criteria);
 
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function findOrThrow($id, $lockMode = null, $lockVersion = null): Book
+    {
+        if (!$entity = $this->find($id, $lockMode, $lockVersion)) {
+            throw new EntityNotFoundException("Book with id $id does not exist");
+        }
+
+        return $entity;
     }
 
 //    /**

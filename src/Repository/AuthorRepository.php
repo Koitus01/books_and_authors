@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Author;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +38,18 @@ class AuthorRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function findOrThrow($id, $lockMode = null, $lockVersion = null): Author
+    {
+        if (!$entity = $this->find($id, $lockMode, $lockVersion)) {
+            throw new EntityNotFoundException("Author with id $id does not exist");
+        }
+
+        return $entity;
     }
 
 //    /**
