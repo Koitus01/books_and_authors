@@ -26,6 +26,8 @@ class UpdateBookTest extends BaseIntegration
             ->setFirstName('Aaaa')
             ->setSecondName('Bbb')
             ->setThirdName('Ccc');
+        $this->doctrine->getManager()->persist($author);
+        $this->doctrine->getManager()->flush();
         $newPagesCount = 13;
         $cover = 'dw3daswrr3w332r32r32.jpg';
         $ubDTO = new UpdateBookDTO(
