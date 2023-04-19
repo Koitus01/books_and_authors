@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\UseCase\CreateAuthor;
+use App\UseCase\UpdateAuthor;
 use App\UseCase\CreateBook;
 use App\UseCase\DeleteBook;
 use App\UseCase\UpdateBook;

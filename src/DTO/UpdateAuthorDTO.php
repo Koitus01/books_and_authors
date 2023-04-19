@@ -5,19 +5,21 @@ namespace App\DTO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class AuthorDTO
+class UpdateAuthorDTO
 {
     public readonly Collection $books;
 
     /**
-     * @param string $first_name
-     * @param string $second_name
+     * @param int $author_id
+     * @param string|null $first_name
+     * @param string|null $second_name
      * @param string|null $third_name
      * @param Collection<int>|null $books — collection of books id
      */
     public function __construct(
-        public readonly string  $first_name,
-        public readonly string  $second_name,
+        public readonly int $author_id,
+        public readonly ?string  $first_name,
+        public readonly ?string  $second_name,
         public readonly ?string $third_name = null,
         ?Collection $books = null,
     )

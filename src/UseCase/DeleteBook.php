@@ -13,9 +13,7 @@ class DeleteBook extends BaseUseCase
     public function execute(int $id): void
     {
         $repository = $this->entityManager->getRepository(Book::class);
-        if (!$book = $repository->find($id)) {
-            throw new EntityNotFoundException('Book already deleted');
-        }
+        $book = $repository->findOrThrow($id);
 
         $this->entityManager->remove($book);
         $this->entityManager->flush();
