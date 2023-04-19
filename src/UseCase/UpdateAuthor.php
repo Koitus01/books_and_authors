@@ -8,8 +8,9 @@ use App\Entity\Book;
 
 class UpdateAuthor extends BaseUseCase
 {
-    public function execute(Author $author, AuthorDTO $DTO): Author
+    public function execute(int $id, AuthorDTO $DTO): Author
     {
+        $author = $this->entityManager->getRepository(Author::class)->findOrThrow($id);
         $author
             ->setFirstName($DTO->first_name)
             ->setSecondName($DTO->second_name)

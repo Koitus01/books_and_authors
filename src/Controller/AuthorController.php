@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Author;
+use App\UseCase\CreateAuthor;
 use App\UseCase\UpdateAuthor;
 use App\UseCase\DeleteAuthor;
 #use App\UseCase\UpdateAuthor;
@@ -12,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthorController extends AbstractController
 {
-    public function create(UpdateAuthor $createAuthor)
+    public function create(CreateAuthor $createAuthor)
     {
         $createAuthor->execute();
 

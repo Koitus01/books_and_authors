@@ -8,7 +8,7 @@ use App\Entity\Book;
 use Doctrine\ORM\EntityNotFoundException;
 
 /**
- * Not used, because no difference between UpdateAuthor
+ * Almost no difference between UpdateAuthor, but still thinking it must be separate class
  */
 class CreateAuthor extends BaseUseCase
 {
