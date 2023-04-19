@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -30,8 +31,9 @@ class BookType extends AbstractType
             ->add('pages_count', IntegerType::class, [
                 'required' => false
             ])
+            ->add('cover', FileType::class)
             ->add('add_author', ButtonType::class, [
-                'attr' => ['class' => 'add_item_link', '']
+                'attr' => ['class' => 'add_item_link']
             ])
             ->add('authors', CollectionType::class, [
                 'entry_type' => AuthorType::class,
@@ -43,12 +45,5 @@ class BookType extends AbstractType
                 'entry_options' => ['attr' => ['placeholder' => 'ФИО']]
             ])
             ->add('save', SubmitType::class);
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Book::class,
-        ]);
     }
 }

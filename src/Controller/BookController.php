@@ -18,13 +18,13 @@ class BookController extends AbstractController
     #[Route('/book/new', name: 'new_book')]
     public function new(CreateBook $createBook, Request $request)
     {
-        $form = $this->createForm(BookType::class, new Book(), [
+        $form = $this->createForm(BookType::class,options: [
             'method' => 'post'
         ]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            dd('cock');
+            dd($form->getData());
             // ... do your form processing, like saving the Task and Tag entities
         }
 
