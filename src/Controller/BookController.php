@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\UseCase\CreateAuthor;
 use App\UseCase\CreateBook;
 use App\UseCase\DeleteBook;
 use App\UseCase\UpdateBook;
@@ -20,7 +21,12 @@ class BookController extends AbstractController
 
     }
 
-    public function update(UpdateBook $deleteBook)
+    public function update(UpdateBook $updateBook)
+    {
+
+    }
+
+    public function read()
     {
 
     }
