@@ -13,6 +13,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthorController extends AbstractController
 {
+
+    public function new()
+    {
+        $this->createForm();
+    }
     public function create(CreateAuthor $createAuthor)
     {
         $createAuthor->execute();
