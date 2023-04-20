@@ -1,4 +1,6 @@
 {
+    "name": "koitus01/book-and-authors",
+    "description": "Manage books and its authors",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
