@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Author;
 use App\ValueObject\Publishing;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -13,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -54,7 +56,12 @@ class BookType extends AbstractType
                 'delete_empty' => true,
                 'label' => 'Авторы. Создадутся, если их еще нет',
                 'row_attr' => ['class' => 'authors', 'id' => 'authors'],
-                'entry_options' => ['attr' => ['placeholder' => 'ФИО']]
+                'entry_options' => [
+                    'attr' => ['placeholder' => 'ФИО'],
+                    'data_class' => Author::class,
+                    'label' => false,
+                    #'disabled' => true
+                ]
             ])
             ->add('save', SubmitType::class);
 
@@ -74,19 +81,11 @@ class BookType extends AbstractType
                 if (!$file) {
                     return null;
                 }
-                return new File($this->coverPath . $file);
+                return new UploadedFile($this->coverPath . $file, $file);
             },
             function ($file) {
                 return $file;
             }
         ));
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        #$resolver->setDefaults();
-        /*        $resolver->setNormalizer('publishing', function(Options $options, $states) {
-                    dd($options, $states);
-                });*/
     }
 }

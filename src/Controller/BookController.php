@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\AuthorDTO;
 use App\DTO\CreateBookDTO;
+use App\DTO\UpdateBookDTO;
 use App\Exceptions\DuplicateBookException;
 use App\Exceptions\InvalidCoverException;
 use App\Exceptions\InvalidISBNException;
@@ -103,14 +104,38 @@ class BookController extends AbstractController
      * @throws EntityNotFoundException
      */
     #[Route('/book/{id}/edit', name: 'book_edit')]
-    public function edit(UpdateBook $updateBook, int $id, BookRepository $repository)
+    public function edit(
+        Request                $request,
+        UpdateBook             $updateBook,
+        int                    $id,
+        BookRepository         $repository,
+        EntityManagerInterface $manager
+    )
     {
         $book = $repository->findOrThrow($id);
-        $form = $this->createForm(BookType::class, $book,  options: [
+        $form = $this->createForm(BookType::class, $book, options: [
             'method' => 'post'
         ]);
 
-        dd($form);
+        $form->handleRequest($request);
+        $data = $form->getData();
+        /** @var \App\Entity\Book $oldBook */
+        $oldBook = $manager->getUnitOfWork()->getOriginalEntityData($book);
+        if ($form->isSubmitted() && $form->isValid() && $oldBook !== $data) {
+            $newISBN = ISBN::fromString($data->getIsbn());
+            $updateBookDTO = new UpdateBookDTO(
+                $data->getId(),
+                $oldBook['title'] !== $data->getTitle() ? $data->getTitle() : null,
+                $oldBook['publishing'] != $data->getPublishing() ? $data->getPublishing() : null,
+                $oldBook['isbn'] != $newISBN ? $newISBN : null,
+                $oldBook['authors'] != $data->getAuthors() ? $data->getAuthors() : null
+            );
+            $result = $updateBook->execute($updateBookDTO);
+        }
+
+        return $this->render('book_new.html.twig', [
+            'form' => $form,
+        ]);
     }
 
     /**

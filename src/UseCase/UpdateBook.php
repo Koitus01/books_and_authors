@@ -48,11 +48,12 @@ class UpdateBook extends BaseUseCase
             if ($DTO->cover) {
                 $book->setCover($DTO->cover);
             }
+
+            // replacing all old authors with new
+            foreach ($book->getAuthors() as $author) {
+                $book->removeAuthor($author);
+            }
             if ($DTO->authors) {
-                // replacing all old authors with new
-                foreach ($book->getAuthors() as $author) {
-                    $book->removeAuthor($author);
-                }
                 foreach ($DTO->authors as $author) {
                     $book->addAuthor($author);
                 }

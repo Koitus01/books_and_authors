@@ -7,15 +7,15 @@
         const addFormToCollection = (e) => {
             const collectionHolder = document.querySelector('#book_authors');
 
-            const item = document.createElement('li');
-            const index = collectionHolder.getElementsByTagName('li').length;
+            const item = document.createElement('div');
+            const index = collectionHolder.getElementsByTagName('div').length;
 
             item.innerHTML = collectionHolder
                 .dataset
                 .prototype
                 .replace(
                     /__name__label__/g,
-                    'ФИО'
+                    ''
                 )
                 .replaceAll(
                     '[__name__]',
@@ -23,7 +23,7 @@
                 );
 
             collectionHolder.appendChild(item);
-            addTagFormDeleteLink(item);
+            addDeleteButton(item);
 
             collectionHolder.dataset.index++;
         };
@@ -37,12 +37,10 @@
         document
             .querySelectorAll('ul.authors li')
             .forEach((tag) => {
-                addTagFormDeleteLink(tag)
+                addDeleteButton(tag)
             });
 
-        // ... the rest of the block from above
-
-        const addTagFormDeleteLink = (item) => {
+        const addDeleteButton = (item) => {
             const removeFormButton = document.createElement('button');
             removeFormButton.innerText = 'Delete this author';
 
@@ -50,10 +48,11 @@
 
             removeFormButton.addEventListener('click', (e) => {
                 e.preventDefault();
-                // remove the li for the tag form
                 item.remove();
             });
         }
+
+        addDeleteButton(document.querySelector('#book_authors > div'));
     </script>
     <style>
         #book {
@@ -84,7 +83,7 @@
             margin-bottom: 15px;
         }
 
-        #book_authors {
+        #book_authors, #book_authors > div {
             flex-direction: column;
         }
 
