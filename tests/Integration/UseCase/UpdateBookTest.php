@@ -35,12 +35,11 @@ class UpdateBookTest extends BaseIntegration
             $newTitle,
             $newPublishing,
             $newIsbn,
-            new ArrayCollection([$author]),
             $newPagesCount,
             $cover
         );
 
-        $result = $ub->execute($ubDTO);
+        $result = $ub->execute($ubDTO, [$author]);
 
         $this->assertEquals($newTitle, $result->getTitle());
         $this->assertEquals($newPublishing, $result->getPublishing());

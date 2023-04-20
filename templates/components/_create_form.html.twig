@@ -39,7 +39,7 @@
 
     const addDeleteButton = (item) => {
         const removeFormButton = document.createElement('button');
-        removeFormButton.innerText = 'Delete this author';
+        removeFormButton.innerText = 'Удалить автора';
 
         item.append(removeFormButton);
 
@@ -52,31 +52,26 @@
     addDeleteButton(document.querySelector('#book_authors > div'));
 </script>
 <style>
-    #book {
+    form {
         display: flex;
         flex-direction: column;
         align-items: center;
         margin: 15px auto 0;
-        width: 100%;
     }
 
-    form {
-        width: 100%;
-    }
-
-    #book div {
+    form div {
         display: flex;
         width: 100%;
         margin-bottom: 15px;
+        flex-direction: column;
     }
 
-    #book div label {
+    form div label {
         width: fit-content;
         margin-right: 15px;
     }
 
-    #book div input {
-        width: 100%;
+    form div input {
         margin-right: 15px;
     }
 
@@ -90,6 +85,18 @@
     }
 
     #book_authors div {
-        margin-bottom: 5px;
+        margin-bottom: 10px;
+    }
+
+    .checkbox {
+        flex-direction: row;
+    }
+
+    button {
+        max-width: 150px;
+    }
+
+    input {
+        max-width: 300px;
     }
 </style>

@@ -17,6 +17,13 @@ class CreateAuthor extends BaseUseCase
      */
     public function execute(AuthorDTO $DTO): Author
     {
+        $authorRepository = $this->entityManager->getRepository(Author::class);
+        try {
+            return $authorRepository->findOneByName($DTO);
+        } catch (EntityNotFoundException) {
+            // No need to create entity, if it already exists
+        }
+
         $author = new Author();
         $author
             ->setFirstName($DTO->first_name)

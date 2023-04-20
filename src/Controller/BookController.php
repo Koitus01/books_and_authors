@@ -23,10 +23,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Throwable;
 
 class BookController extends AbstractController
 {
@@ -42,7 +44,7 @@ class BookController extends AbstractController
      * @throws InvalidCoverException
      * @throws InvalidISBNException
      * @throws ParsePublishingYearException
-     * @throws \Throwable
+     * @throws Throwable
      */
     #[Route('/book/new', name: 'book_new')]
     public function new(
@@ -77,7 +79,7 @@ class BookController extends AbstractController
 
                 $entityManager->commit();
                 return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $entityManager->rollback();
                 $fileSave->rollback();
                 throw $e;
@@ -107,17 +109,28 @@ class BookController extends AbstractController
     }
 
     /**
+     * @param Request $request
      * @param UpdateBook $updateBook
      * @param int $id
      * @param BookRepository $repository
+     * @param EntityManagerInterface $entityManager
+     * @param SaveCover $fileSave
+     * @param CreateAuthor $createAuthor
+     * @return RedirectResponse|Response
+     * @throws DuplicateBookException
      * @throws EntityNotFoundException
+     * @throws InvalidCoverException
+     * @throws Throwable
      */
     #[Route('/book/{id}/edit', name: 'book_edit')]
     public function edit(
-        Request        $request,
-        UpdateBook     $updateBook,
-        int            $id,
-        BookRepository $repository
+        Request                $request,
+        UpdateBook             $updateBook,
+        int                    $id,
+        BookRepository         $repository,
+        EntityManagerInterface $entityManager,
+        SaveCover              $fileSave,
+        CreateAuthor           $createAuthor,
     )
     {
         $book = $repository->findOrThrow($id);
@@ -125,20 +138,38 @@ class BookController extends AbstractController
             'method' => 'post',
             'attr' => ['class' => 'center'],
             'required' => false
-        ]);
+        ])->add('leave_authors', CheckboxType::class,
+            ['row_attr' => ['class' => 'checkbox'],
+                'label' => 'Не удалять существующих авторов'
+            ]);
 
         $form->handleRequest($request);
         $data = $form->getData();
         if ($form->isSubmitted() && $form->isValid() && array_filter($data)) {
-            $updateBookDTO = new UpdateBookDTO(
-                $id,
-                $data['title'],
-                $data['publishing'],
-                $data['isbn'],
-                new ArrayCollection($data['authors'])
-            );
-            $result = $updateBook->execute($updateBookDTO);
-            return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
+            $entityManager->beginTransaction();
+            try {
+                $cover = $data['cover'] ? $fileSave->execute($data['cover']) : null;
+
+                $authors = $createAuthor->executeMany($data['authors']);
+                if ($data['leave_authors']) $authors = array_merge($authors, $book->getAuthors()->toArray());
+
+                $updateBookDTO = new UpdateBookDTO(
+                    $id,
+                    $data['title'],
+                    $data['publishing'],
+                    $data['isbn'],
+                    $data['pages_count'],
+                    $cover
+                );
+                $result = $updateBook->execute($updateBookDTO, $authors);
+
+                $entityManager->commit();
+                return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
+            } catch (Throwable $e) {
+                $entityManager->rollback();
+                $fileSave->rollback();
+                throw $e;
+            }
         }
 
         return $this->render('book_edit.html.twig', [

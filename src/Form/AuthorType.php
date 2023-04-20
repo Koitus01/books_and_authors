@@ -12,11 +12,18 @@ class AuthorType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('first_name', TextType::class, ['attr' => ['placeholder' => 'Имя']])
-            ->add('second_name', TextType::class, ['attr' => ['placeholder' => 'Фамилия']])
+            ->add('second_name', TextType::class, [
+                'attr' => ['placeholder' => 'Фамилия'],
+                'label' => 'Фамилия'
+            ])
+            ->add('first_name', TextType::class, [
+                'attr' => ['placeholder' => 'Имя'],
+                'label' => 'Имя'
+            ])
             ->add('third_name', TextType::class, [
                 'attr' => ['placeholder' => 'Отчество'],
-                'required' => false
+                'required' => false,
+                'label' => 'Отчество (необязательно)'
             ]);
     }
 }

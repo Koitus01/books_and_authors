@@ -32,45 +32,49 @@ class BookType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'attr' => ['placeholder' => 'Название книги']
+                'attr' => ['placeholder' => 'Отверженные'],
+                'label' => 'Название книги'
             ])
             ->add('publishing', IntegerType::class, [
-                'attr' => ['placeholder' => 'Год издания', 'min' => 0, 'max' => date('Y')]
+                'attr' => ['placeholder' => '1862', 'min' => 1000, 'max' => date('Y')],
+                'label' => 'Год издания'
             ])
             ->add('isbn', TextType::class, [
-                'attr' => ['placeholder' => '978-1-56619-909-4 или 1-56619-909-3 или 1566199093']
+                'attr' => ['placeholder' => '978-1-56619-909-4 или 1-56619-909-3 или 1566199093'],
+                'label' => 'ISBN'
             ])
             ->add('pages_count', IntegerType::class, [
-                'required' => false
+                'required' => false,
+                'label' => 'Количество страниц'
             ])
             ->add('cover', FileType::class, [
                 'required' => false,
-                'attr' => ['accept' => 'image/png, image/jpeg']
+                'attr' => ['accept' => 'image/png, image/jpeg'],
+                'label' => 'Обложка'
             ])
             ->add('add_author', ButtonType::class, [
                 'attr' => ['class' => 'add_item_link'],
+                'label' => 'Добавить автора'
             ])
             ->add('authors', CollectionType::class, [
                 'entry_type' => AuthorType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
                 'delete_empty' => true,
-                'label' => 'Авторы создадутся, если их еще нет',
+                'label' => false,
                 'row_attr' => ['class' => 'authors', 'id' => 'authors'],
                 'entry_options' => [
                     'attr' => ['placeholder' => 'ФИО'],
                     'label' => false
                 ]
             ])
-            ->add('save', SubmitType::class);
+            ->add('save', SubmitType::class, [
+                'label' => 'Сохранить'
+            ]);
 
         $builder->get('authors')->addModelTransformer(new CallbackTransformer(
             function ($authors) {
                 return $authors;
-                if (!$publishingAsObject) {
-                    return null;
-                }
-                return (int)$publishingAsObject->value()->format('Y');
             },
             function ($authors) {
                 return array_map(function ($author) {
@@ -80,6 +84,18 @@ class BookType extends AbstractType
                         $author['third_name']
                     );
                 }, array_filter($authors));
+            }
+        ));
+
+        $builder->get('publishing')->addModelTransformer(new CallbackTransformer(
+            function ($publishingAsObject) {
+                return $publishingAsObject;
+            },
+            function ($publishingAsInt) {
+                if (!$publishingAsInt) {
+                    return $publishingAsInt;
+                }
+                return Publishing::fromScalar($publishingAsInt);
             }
         ));
     }

@@ -5,13 +5,15 @@
     <span>ID: {{ book.id }}</span>
     <span>Название: {{ book.title }}</span>
     <span>Год публикации: {{ book.publishing }}</span>
-    <span>Количество страниц: {{ book.getPagesCount }}</span>
+    {% if book.getPagesCount > 0 %}
+        <span>Количество страниц: {{ book.getPagesCount }}</span>
+    {% endif %}
     <span>ISBN: {{ book.isbn }}</span>
     {% if book.authors|length > 0 %}
     <div class="authors">
         <span>Авторы:</span>
         {% for author in book.authors %}
-            <span>{{ author.getSecondName ~ ' ' ~ author.getFirstName ~ ' ' ~ author.getThirdName }}</span>
+            <span>ФИО: {{ author.getSecondName ~ ' ' ~ author.getFirstName ~ ' ' ~ author.getThirdName }}</span>
         {% endfor %}
     </div>
     {% endif %}
