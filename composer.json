@@ -49,6 +49,13 @@
         "symfony/polyfill-php81": "*"
     },
     "scripts": {
+        "auto-scripts": {
+            "migration:migrate:dev": "./bin/console --env=dev doctrine:migration:migrate -n",
+            "migration:migrate:test": "./bin/console --env=test doctrine:migration:migrate -n"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"
