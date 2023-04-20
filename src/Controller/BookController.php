@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\AuthorDTO;
 use App\DTO\CreateBookDTO;
 use App\DTO\UpdateBookDTO;
 use App\Exceptions\DuplicateBookException;
@@ -18,7 +17,6 @@ use App\UseCase\DeleteBook;
 use App\UseCase\UpdateBook;
 use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,7 +51,7 @@ class BookController extends AbstractController
         SaveCover              $fileSave,
         CreateAuthor           $createAuthor,
         EntityManagerInterface $entityManager
-    )
+    ): RedirectResponse|Response
     {
         $form = $this->createForm(BookType::class, options: [
             'method' => 'post'
@@ -131,7 +129,7 @@ class BookController extends AbstractController
         EntityManagerInterface $entityManager,
         SaveCover              $fileSave,
         CreateAuthor           $createAuthor,
-    )
+    ): RedirectResponse|Response
     {
         $book = $repository->findOrThrow($id);
         $form = $this->createForm(BookType::class, options: [

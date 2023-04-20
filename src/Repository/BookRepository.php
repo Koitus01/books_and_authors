@@ -70,6 +70,21 @@ class BookRepository extends ServiceEntityRepository
         return $entity;
     }
 
+    /**
+     * @param array $ids
+     * @return array<Book>
+     * @throws EntityNotFoundException
+     */
+    public function findByIDs(array $ids): array
+    {
+        $entities = [];
+        foreach ($ids as $id) {
+             $entities = $this->findOrThrow($id);
+        }
+
+        return $entities;
+    }
+
 //    /**
 //     * @return Book[] Returns an array of Book objects
 //     */

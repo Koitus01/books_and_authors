@@ -8,7 +8,13 @@ use App\Entity\Book;
 
 class UpdateAuthor extends BaseUseCase
 {
-    public function execute(int $id, AuthorDTO $DTO): Author
+    /**
+     * @param int $id
+     * @param AuthorDTO $DTO
+     * @param array<Book> $books
+     * @return Author
+     */
+    public function execute(int $id, AuthorDTO $DTO, array $books = []): Author
     {
         $author = $this->entityManager->getRepository(Author::class)->findOrThrow($id);
         $author
@@ -16,9 +22,7 @@ class UpdateAuthor extends BaseUseCase
             ->setSecondName($DTO->second_name)
             ->setThirdName($DTO->third_name);
 
-        $bookRepository = $this->entityManager->getRepository(Book::class);
-        foreach ($DTO->books as $bookId) {
-            $book = $bookRepository->findOrThrow($bookId);
+        foreach ($books as $book) {
             $author->addBook($book);
         }
 

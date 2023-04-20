@@ -13,9 +13,11 @@ use Doctrine\ORM\EntityNotFoundException;
 class CreateAuthor extends BaseUseCase
 {
     /**
-     * @throws EntityNotFoundException
+     * @param AuthorDTO $DTO
+     * @param array<Book> $books
+     * @return Author
      */
-    public function execute(AuthorDTO $DTO): Author
+    public function execute(AuthorDTO $DTO, array $books = []): Author
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
         try {
@@ -30,9 +32,8 @@ class CreateAuthor extends BaseUseCase
             ->setSecondName($DTO->second_name)
             ->setThirdName($DTO->third_name);
 
-        $bookRepository = $this->entityManager->getRepository(Book::class);
-        foreach ($DTO->books as $bookId) {
-            $author->addBook($bookRepository->findOrThrow($bookId));
+        foreach ($books as $book) {
+            $author->addBook($book);
         }
 
         $this->entityManager->persist($author);
@@ -44,7 +45,6 @@ class CreateAuthor extends BaseUseCase
     /**
      * @param array<AuthorDTO> $authors
      * @return array<Author>
-     * @throws EntityNotFoundException
      */
     public function executeMany(array $authors): array
     {

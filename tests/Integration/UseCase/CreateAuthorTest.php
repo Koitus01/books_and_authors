@@ -3,6 +3,8 @@
 namespace App\Tests\Integration\UseCase;
 
 use App\DTO\AuthorDTO;
+use App\Entity\Author;
+use App\Entity\Book;
 use App\Tests\Integration\BaseIntegration;
 use App\UseCase\CreateAuthor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,11 +19,18 @@ class CreateAuthorTest extends BaseIntegration
         $firstName = 'Aaaa';
         $secondName = 'Bbbb';
         $thirdName = 'Cccc';
-        $book = $this->createLesMiserables();
-        $books = new ArrayCollection([$book->getId()]);
+        $book = new Book();
+        $book
+            ->setTitle($this->title())
+            ->setIsbn($this->ISBN())
+            ->setPublishing($this->publishing())
+            ->setPagesCount(1462);
+        $this->doctrine->getManager()->persist($book);
 
-        $result = $ca->execute(new AuthorDTO($firstName, $secondName, $thirdName, $books));
+        $authorDTO = new AuthorDTO($firstName, $secondName, $thirdName);
 
+
+        $result = $ca->execute($authorDTO, [$book]);
         $this->assertEquals($firstName, $result->getFirstName());
         $this->assertEquals($secondName, $result->getSecondName());
         $this->assertEquals($thirdName, $result->getThirdName());
@@ -44,16 +53,22 @@ class CreateAuthorTest extends BaseIntegration
         $this->assertEmpty($result->getBooks());
     }
 
-    public function testExecuteWithNonExistentBookWillThrow()
+    public function testExecuteWithExistingEntityReturnIt()
     {
-        $this->expectException(EntityNotFoundException::class);
         /** @var CreateAuthor $ca */
         $ca = $this->container->get(CreateAuthor::class);
-        $firstName = 'Aaaa';
-        $secondName = 'Bbbb';
-        $thirdName = 'Cccc';
-        $books = new ArrayCollection([21]);
+        $author = new Author();
+        $author->setFirstName($this->firstname())->setSecondName($this->secondName());
+        $authorDTO = new AuthorDTO(
+            $author->getFirstName(),
+            $author->getSecondName(),
+            $author->getThirdName()
+        );
+        $this->doctrine->getManager()->persist($author);
+        $this->doctrine->getManager()->flush();
 
-        $ca->execute(new AuthorDTO($firstName, $secondName, $thirdName, $books));
+        $result = $ca->execute($authorDTO);
+
+        $this->assertEquals($author, $result);
     }
 }
