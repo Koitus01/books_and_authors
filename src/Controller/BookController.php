@@ -4,15 +4,12 @@ namespace App\Controller;
 
 use App\DTO\AuthorDTO;
 use App\DTO\CreateBookDTO;
-use App\Entity\Author;
-use App\Entity\Book;
 use App\Exceptions\DuplicateBookException;
 use App\Exceptions\InvalidCoverException;
 use App\Exceptions\InvalidISBNException;
 use App\Exceptions\ParsePublishingYearException;
 use App\Form\BookType;
-use App\Service\CoverSave;
-use App\UseCase\UpdateAuthor;
+use App\Service\SaveCover;
 use App\UseCase\CreateBook;
 use App\UseCase\DeleteBook;
 use App\UseCase\UpdateBook;
@@ -28,6 +25,7 @@ class BookController extends AbstractController
 {
 
     /**
+     * TODO: rollback cover saving
      * @throws ParsePublishingYearException
      * @throws InvalidCoverException
      * @throws DuplicateBookException
@@ -37,7 +35,7 @@ class BookController extends AbstractController
     public function new(
         Request                $request,
         CreateBook             $createBook,
-        CoverSave              $fileSave,
+        SaveCover              $fileSave,
         EntityManagerInterface $manager,
     )
     {
@@ -52,9 +50,12 @@ class BookController extends AbstractController
                 $fileSave->execute($data['cover'], $this->getParameter('app.cover_path')) :
                 null;
             $authors = array_map(function ($author) use ($manager) {
-                $DTO = new AuthorDTO($author['first_name'], $author['second_name'], $author['third_name']);
-                return $manager->getRepository(Author::class)->findOneByName($DTO);
-            }, $data['authors']);
+                return new AuthorDTO(
+                    $author['first_name'],
+                    $author['second_name'],
+                    $author['third_name']
+                );
+            }, array_filter($data['authors']));
             $createBookDTO = new CreateBookDTO(
                 $data['title'],
                 Publishing::fromScalar($data['publishing']),
@@ -92,6 +93,7 @@ class BookController extends AbstractController
 
     }
 
+    #[Route('/book/{id}')]
     public function read()
     {
 

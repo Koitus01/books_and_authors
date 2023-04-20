@@ -2,6 +2,7 @@
 
 namespace App\Tests\Integration\UseCase;
 
+use App\DTO\AuthorDTO;
 use App\DTO\CreateBookDTO;
 use App\Entity\Author;
 use App\Exceptions\DuplicateBookException;
@@ -10,7 +11,6 @@ use App\UseCase\CreateBook;
 use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\ORMInvalidArgumentException;
 
 class CreateBookTest extends BaseIntegration
 {
@@ -57,14 +57,11 @@ class CreateBookTest extends BaseIntegration
         $cb->execute($cbDTO);
     }
 
-    public function testExecuteWithAuthor()
+    public function testExecuteWithNonExistentAuthorWillCreateIt()
     {
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
-        $author = new Author();
-        $author->setFirstName($this->firstname())->setSecondName($this->secondName());
-        $this->doctrine->getManager()->persist($author);
-        $this->doctrine->getManager()->flush();
+        $author = new AuthorDTO($this->firstname(), $this->secondName());
         $authors = new ArrayCollection([$author]);
         $cbDTO = new CreateBookDTO(
             $this->title(),
@@ -78,17 +75,24 @@ class CreateBookTest extends BaseIntegration
         $this->assertEquals($this->title(), $result->getTitle());
         $this->assertEquals($this->publishing(), $result->getPublishing());
         $this->assertEquals($this->ISBN()->value(), $result->getISBN());
-        $this->assertEquals($author, $result->getAuthors()->first());
+        $this->assertEquals($this->firstname(), $result->getAuthors()->first()->getFirstName());
+        $this->assertEquals($this->secondName(), $result->getAuthors()->first()->getSecondName());
     }
 
-    public function testExecuteWithNonExistentAuthorWillThrow()
+    public function testExecuteWithExistentAuthor()
     {
-        $this->expectException(ORMInvalidArgumentException::class);
         /** @var CreateBook $cb */
         $cb = $this->container->get(CreateBook::class);
         $author = new Author();
         $author->setFirstName($this->firstname())->setSecondName($this->secondName());
-        $authors = new ArrayCollection([$author]);
+        $this->doctrine->getManager()->persist($author);
+        $this->doctrine->getManager()->flush();
+        $authorDTO = new AuthorDTO(
+            $author->getFirstName(),
+            $author->getSecondName(),
+            $author->getThirdName()
+        );
+        $authors = new ArrayCollection([$authorDTO]);
         $cbDTO = new CreateBookDTO(
             $this->title(),
             $this->publishing(),
@@ -96,6 +100,12 @@ class CreateBookTest extends BaseIntegration
             $authors,
         );
 
-        $cb->execute($cbDTO);
+        $result = $cb->execute($cbDTO);
+
+        $this->assertEquals($this->title(), $result->getTitle());
+        $this->assertEquals($this->publishing(), $result->getPublishing());
+        $this->assertEquals($this->ISBN()->value(), $result->getISBN());
+        $this->assertEquals($author->getFirstName(), $result->getAuthors()->first()->getFirstName());
+        $this->assertEquals($author->getSecondName(), $result->getAuthors()->first()->getSecondName());
     }
 }

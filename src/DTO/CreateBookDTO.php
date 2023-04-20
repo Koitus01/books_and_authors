@@ -2,7 +2,6 @@
 
 namespace App\DTO;
 
-use App\Entity\Author;
 use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,7 +15,7 @@ class CreateBookDTO
      * @param string $title
      * @param Publishing $publishing
      * @param ISBN $isbn — accepted 10 and 13 variants with or without hyphens
-     * @param Collection<Author>|null $authors
+     * @param Collection<AuthorDTO>|null $authors
      * @param int|null $pages_count
      * @param string|null $cover — cover image filename
      */

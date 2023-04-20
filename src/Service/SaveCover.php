@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Exceptions\InvalidCoverException;
 use Symfony\Component\HttpFoundation\File\File;
 
-class CoverSave
+class SaveCover
 {
     public const ALLOWED_TYPES = [
         'image/png' => 'png',

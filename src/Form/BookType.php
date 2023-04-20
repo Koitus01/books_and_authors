@@ -20,7 +20,7 @@ class BookType extends AbstractType
                 'attr' => ['placeholder' => 'Название книги']
             ])
             ->add('publishing', IntegerType::class, [
-                'attr' => ['placeholder' => 'Год издания','min' => 0, 'max' => date('Y')]
+                'attr' => ['placeholder' => 'Год издания', 'min' => 0, 'max' => date('Y')]
             ])
             ->add('isbn', TextType::class, [
                 'attr' => ['placeholder' => '978-1-56619-909-4 или 1-56619-909-3 или 1566199093']
@@ -40,7 +40,7 @@ class BookType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'delete_empty' => true,
-                'label' => 'Авторы',
+                'label' => 'Авторы. Создадутся, если их еще нет',
                 'row_attr' => ['class' => 'authors', 'id' => 'authors'],
                 'entry_options' => ['attr' => ['placeholder' => 'ФИО']]
             ])
