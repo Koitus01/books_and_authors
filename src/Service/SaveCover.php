@@ -31,7 +31,7 @@ class SaveCover
         }
 
         if (!in_array($file->guessExtension(), self::ALLOWED_EXTENSIONS)) {
-            throw new InvalidCoverException('Cover is jpeg or png');
+            throw new InvalidCoverException('Cover is not jpeg or png');
         }
 
         $fileName = 'image_' . date('Y-m-d-H-i-s') . '_' . uniqid() . '.' . $file->guessExtension();
