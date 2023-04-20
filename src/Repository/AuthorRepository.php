@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\AuthorDTO;
 use App\Entity\Author;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityNotFoundException;
@@ -47,6 +48,28 @@ class AuthorRepository extends ServiceEntityRepository
     {
         if (!$entity = $this->find($id, $lockMode, $lockVersion)) {
             throw new EntityNotFoundException("Author with id $id does not exist");
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function findOneByName(AuthorDTO $DTO): Author
+    {
+        $criteria = [
+            'first_name' => $DTO->first_name,
+            'second_name' => $DTO->second_name
+        ];
+        if ($DTO->third_name) {
+            $criteria['third_name'] = $DTO->third_name;
+        }
+
+        $entity = $this->findOneBy($criteria);
+        if (!$entity) {
+            $error = 'Author' . $DTO->second_name . ' ' . $DTO->first_name . ' ' . $DTO->third_name . ' does not exist';
+            throw new EntityNotFoundException($error);
         }
 
         return $entity;

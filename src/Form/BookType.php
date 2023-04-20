@@ -2,9 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Book;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -12,7 +10,6 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BookType extends AbstractType
 {
@@ -31,7 +28,10 @@ class BookType extends AbstractType
             ->add('pages_count', IntegerType::class, [
                 'required' => false
             ])
-            ->add('cover', FileType::class)
+            ->add('cover', FileType::class, [
+                'required' => false,
+                'attr' => ['accept' => 'image/png, image/jpeg']
+            ])
             ->add('add_author', ButtonType::class, [
                 'attr' => ['class' => 'add_item_link']
             ])

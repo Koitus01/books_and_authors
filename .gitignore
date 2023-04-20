@@ -11,3 +11,4 @@
 ###< symfony/framework-bundle ###
 
 /.phpunit.result.cache
+/public/upload/
