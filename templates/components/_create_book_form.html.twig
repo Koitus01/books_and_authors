@@ -1,0 +1,102 @@
+{{ form(form) }}
+
+<script>
+    const addFormToCollection = (e) => {
+        const collectionHolder = document.querySelector('#book_authors');
+
+        const item = document.createElement('div');
+        const index = collectionHolder.getElementsByTagName('div').length;
+
+        item.innerHTML = collectionHolder
+            .dataset
+            .prototype
+            .replace(
+                /__name__label__/g,
+                ''
+            )
+            .replaceAll(
+                '[__name__]',
+                '[' + index + ']'
+            );
+
+        collectionHolder.appendChild(item);
+        addDeleteButton(item);
+
+        collectionHolder.dataset.index++;
+    };
+
+    document
+        .querySelectorAll('.add_item_link')
+        .forEach(btn => {
+            btn.addEventListener("click", addFormToCollection)
+        });
+
+    document
+        .querySelectorAll('ul.authors li')
+        .forEach((tag) => {
+            addDeleteButton(tag)
+        });
+
+    const addDeleteButton = (item) => {
+        const removeFormButton = document.createElement('button');
+        removeFormButton.innerText = 'Удалить автора';
+
+        item.append(removeFormButton);
+
+        removeFormButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            item.remove();
+        });
+    }
+
+    addDeleteButton(document.querySelector('#book_authors > div'));
+</script>
+<style>
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 15px auto 0;
+    }
+
+    form div {
+        display: flex;
+        width: 100%;
+        margin-bottom: 15px;
+        flex-direction: column;
+    }
+
+    form div label {
+        width: fit-content;
+        margin-right: 15px;
+    }
+
+    form div input {
+        margin-right: 15px;
+    }
+
+    li {
+        list-style: none;
+        margin-bottom: 15px;
+    }
+
+    #book_authors, #book_authors > div {
+        flex-direction: column;
+    }
+
+    #book_authors div {
+        margin-bottom: 10px;
+    }
+
+    .checkbox {
+        flex-direction: row;
+    }
+
+    button {
+        max-width: 150px;
+    }
+
+    input {
+        max-width: 300px;
+    }
+</style>

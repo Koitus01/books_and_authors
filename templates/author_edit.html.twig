@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="center">
+        {% include 'components/_author.html.twig' with {hide_links: true} %}
+        <span style="margin: 15px 0">Редактирование автора</span>
+        {% include 'components/_create_author_form.html.twig' %}
+    </div>
+
+{% endblock %}

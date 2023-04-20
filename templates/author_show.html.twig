@@ -1,0 +1,5 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'components/_author.html.twig' with {author: author} only %}
+{% endblock %}

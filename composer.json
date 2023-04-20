@@ -1,4 +1,6 @@
 {
+    "name": "koitus01/book-and-authors",
+    "description": "Manage books and its authors",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
@@ -6,14 +8,19 @@
     "require": {
         "php": ">=8.1",
         "ext-ctype": "*",
+        "ext-exif": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
+        "symfony/filesystem": "^6.2",
+        "symfony/form": "^6.2",
         "symfony/framework-bundle": "6.2.*",
+        "symfony/lock": "^6.2",
+        "symfony/mime": "^6.2",
+        "symfony/orm-pack": "^2.3",
         "symfony/runtime": "6.2.*",
         "symfony/yaml": "6.2.*"
-    },
-    "require-dev": {
     },
     "config": {
         "allow-plugins": {
@@ -42,6 +49,13 @@
         "symfony/polyfill-php81": "*"
     },
     "scripts": {
+        "auto-scripts": {
+            "migration:migrate:dev": "./bin/console --env=dev doctrine:migration:migrate -n",
+            "migration:migrate:test": "./bin/console --env=test doctrine:migration:migrate -n"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -51,5 +65,11 @@
             "allow-contrib": false,
             "require": "6.2.*"
         }
+    },
+    "require-dev": {
+        "dama/doctrine-test-bundle": "^7.2",
+        "mockery/mockery": "^1.5",
+        "symfony/profiler-pack": "^1.0",
+        "symfony/test-pack": "^1.1"
     }
 }

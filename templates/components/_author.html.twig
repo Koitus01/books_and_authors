@@ -1,0 +1,35 @@
+<div class="author-show">
+    <span>ID: {{ author.id }}</span>
+    <span>Фамилия: {{ author.getSecondname }}</span>
+    <span>Имя: {{ author.getFirstname }}</span>
+    {% if author.getThirdname %}
+        <span>Отчество {{ author.getThirdname }}</span>
+    {% endif %}
+
+    <div class="center">
+        {% if author.books|length > 0 %}
+            <span>Книги:</span>
+            {% for book in author.books %}
+                <a href="{{ path('book_show', {id: book.id}) }}">{{ book.title }}</a>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% if hide_links is not defined %}
+        <div class="links">
+            <a class="links__delete" onclick="if (confirm('Подтверждаете удаление?')) {
+                    window.open('{{ path('author_delete', {id: author.id}) }}');
+                    }">Удалить</a>
+            <a class="links__edit" href="{{ path('author_edit', {id: author.id}) }}">Отредактировать</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .author-show {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: auto;
+    }
+</style>
