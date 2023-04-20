@@ -50,4 +50,9 @@ class Publishing
     {
         return $this->publishing;
     }
+
+    public function __toString()
+    {
+        return $this->publishing->format('Y');
+    }
 }

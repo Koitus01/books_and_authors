@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="book-list">
+        {% if books|length > 0 %}
+        {% for book in books %}
+            {% include 'components/_book.html.twig' with {book: book} only %}
+            <p>_____________________________________________</p>
+            <br>
+        {% endfor %}
+        {% else %}
+            <span style="margin-bottom: 15px">Нет книг</span>
+            <a href="{{ path('book_new') }}">Создать</a>
+        {% endif %}
+    </div>
+
+    <style>
+        .book-list {
+            display: flex;
+            flex-direction: column;
+            max-width: fit-content;
+            margin: auto
+        }
+    </style>
+{% endblock %}

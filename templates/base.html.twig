@@ -12,8 +12,17 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
+        <style>
+            .center {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: auto;
+            }
+        </style>
     </head>
     <body>
+        <a style="margin-bottom: 15px" href="{{ path('main') }}">Вернуться на главную</a>
         {% block body %}{% endblock %}
     </body>
 </html>

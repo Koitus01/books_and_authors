@@ -1,0 +1,51 @@
+<div class="book-show">
+    {% if book.cover %}
+        <img width="250" height="250" class="book-show__img" src="/upload/cover/{{ book.cover }}">
+    {% endif %}
+    <span>ID: {{ book.id }}</span>
+    <span>Название: {{ book.title }}</span>
+    <span>Год публикации: {{ book.publishing }}</span>
+    <span>Количество страниц: {{ book.getPagesCount }}</span>
+    <span>ISBN: {{ book.isbn }}</span>
+    <div class="authors">
+        <span>Авторы:</span>
+        {% for author in book.authors %}
+            <span>{{ author.getSecondName ~ ' ' ~ author.getFirstName ~ ' ' ~ author.getThirdName }}</span>
+        {% endfor %}
+    </div>
+    <div class="links">
+        <a class="links__delete" onclick="if (confirm('Подтверждаете удаление?')) {
+                window.open('{{ path('book_delete', {id: book.id}) }}');
+                }">Удалить (без предупреждения)</a>
+        <a class="links__edit" href="{{ path('book_edit', {id: book.id}) }}">Отредактировать</a>
+    </div>
+</div>
+
+<style>
+    .book-show {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: auto;
+    }
+
+    .book-show__img {
+        margin-bottom: 15px;
+    }
+
+    .authors {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .links__delete {
+        margin-right: 15px;
+        color: red;
+    }
+
+    .links__edit {
+        margin-right: 15px;
+        color: green;
+    }
+</style>

@@ -9,6 +9,7 @@ use App\Exceptions\InvalidCoverException;
 use App\Exceptions\InvalidISBNException;
 use App\Exceptions\ParsePublishingYearException;
 use App\Form\BookType;
+use App\Repository\BookRepository;
 use App\Service\SaveCover;
 use App\UseCase\CreateBook;
 use App\UseCase\DeleteBook;
@@ -17,21 +18,24 @@ use App\ValueObject\ISBN;
 use App\ValueObject\Publishing;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BookController extends AbstractController
 {
 
     /**
-     * TODO: rollback cover saving
+     * TODO: rollback cover saving and redirect to created book
      * @throws ParsePublishingYearException
      * @throws InvalidCoverException
      * @throws DuplicateBookException
      * @throws InvalidISBNException
      */
-    #[Route('/book/new', name: 'new_book')]
+    #[Route('/book/new', name: 'book_new')]
     public function new(
         Request                $request,
         CreateBook             $createBook,
@@ -46,6 +50,7 @@ class BookController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+            // Move save in CreateBook???
             $cover = $data['cover'] ?
                 $fileSave->execute($data['cover'], $this->getParameter('app.cover_path')) :
                 null;
@@ -65,38 +70,73 @@ class BookController extends AbstractController
                 $cover
             );
             $result = $createBook->execute($createBookDTO);
-            dd($result);
+
+            return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
         }
 
-        return $this->render('new_book.html.twig', [
+        return $this->render('book_new.html.twig', [
             'form' => $form,
         ]);
     }
 
-    public function create(CreateBook $createBook)
+    /**
+     * @param DeleteBook $deleteBook
+     * @param Filesystem $filesystem
+     * @param int $id
+     * @return Response
+     * @throws EntityNotFoundException
+     */
+    #[Route('/book/{id}/delete', name: 'book_delete')]
+    public function delete(DeleteBook $deleteBook, Filesystem $filesystem, int $id): Response
     {
-        $form = $this->createForm(BookType::class);
+        $book = $deleteBook->execute($id);
+        // Move remove cover to DeleteBook???
+        $filesystem->remove($this->getParameter('app.cover_path') . $book->getCover());
 
-        return $this->render('new_book.html.twig', [
-            'form' => $form,
+        return $this->render('book_deleted.html.twig', ['book' => $book]);
+    }
+
+    /**
+     * @param UpdateBook $updateBook
+     * @param int $id
+     * @param BookRepository $repository
+     * @throws EntityNotFoundException
+     */
+    #[Route('/book/{id}/edit', name: 'book_edit')]
+    public function edit(UpdateBook $updateBook, int $id, BookRepository $repository)
+    {
+        $book = $repository->findOrThrow($id);
+        $form = $this->createForm(BookType::class, $book,  options: [
+            'method' => 'post'
         ]);
 
+        dd($form);
     }
 
-    public function delete(DeleteBook $deleteBook)
+    /**
+     * @throws EntityNotFoundException
+     */
+    #[Route('/book/{id}', name: 'book_show')]
+    public function show(BookRepository $repository, int $id): Response
     {
-
+        return $this->render('book_show.html.twig', [
+            'cover_path' => $this->getParameter('app.cover_path'),
+            'book' => $repository->findOrThrow($id)
+        ]);
     }
 
-    public function update(UpdateBook $updateBook)
+    /**
+     * TODO: пагинация, сортировка (?????), поиск (?????)
+     * @param BookRepository $repository
+     * @return Response
+     */
+    #[Route('/books', name: 'books')]
+    public function showAll(BookRepository $repository): Response
     {
-
-    }
-
-    #[Route('/book/{id}')]
-    public function read()
-    {
-
+        return $this->render('books.html.twig', [
+            'cover_path' => $this->getParameter('app.cover_path'),
+            'books' => $repository->findAll()
+        ]);
     }
 
 }
