@@ -2,7 +2,6 @@
 
 namespace App\UseCase;
 
-
 use App\DTO\UpdateBookDTO;
 use App\Entity\Author;
 use App\Entity\Book;
@@ -10,7 +9,6 @@ use App\Exceptions\DuplicateBookException;
 use App\Repository\BookRepository;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
-use Throwable;
 
 class UpdateBook extends BaseUseCase
 {

@@ -9,8 +9,6 @@ use Doctrine\Common\Collections\Collection;
 
 class CreateBookDTO
 {
-    public readonly Collection $authors;
-
     /**
      * @param string $title
      * @param Publishing $publishing

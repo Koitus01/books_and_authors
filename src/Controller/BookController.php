@@ -7,7 +7,7 @@ use App\DTO\UpdateBookDTO;
 use App\Exceptions\DuplicateBookException;
 use App\Exceptions\InvalidCoverException;
 use App\Exceptions\InvalidISBNException;
-use App\Exceptions\ParsePublishingYearException;
+use App\Exceptions\InvalidYearException;
 use App\Form\BookType;
 use App\Repository\BookRepository;
 use App\Service\SaveCover;
@@ -22,6 +22,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +42,7 @@ class BookController extends AbstractController
      * @throws EntityNotFoundException
      * @throws InvalidCoverException
      * @throws InvalidISBNException
-     * @throws ParsePublishingYearException
+     * @throws InvalidYearException
      * @throws Throwable
      */
     #[Route('/book/new', name: 'book_new')]
@@ -136,9 +137,10 @@ class BookController extends AbstractController
             'method' => 'post',
             'attr' => ['class' => 'center'],
             'required' => false
-        ])->add('leave_authors', CheckboxType::class,
+        ])->add('delete_authors', CheckboxType::class,
             ['row_attr' => ['class' => 'checkbox'],
-                'label' => 'Не удалять существующих авторов'
+                'label' => 'Удалить существующих авторов',
+                'priority' => 5
             ]);
 
         $form->handleRequest($request);
@@ -149,7 +151,7 @@ class BookController extends AbstractController
                 $cover = $data['cover'] ? $fileSave->execute($data['cover']) : null;
 
                 $authors = $createAuthor->executeMany($data['authors']);
-                if ($data['leave_authors']) $authors = array_merge($authors, $book->getAuthors()->toArray());
+                if (!$data['delete_authors']) $authors = array_merge($authors, $book->getAuthors()->toArray());
 
                 $updateBookDTO = new UpdateBookDTO(
                     $id,

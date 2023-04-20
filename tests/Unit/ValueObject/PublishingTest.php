@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\ValueObject;
 
-use App\Exceptions\ParsePublishingYearException;
+use App\Exceptions\InvalidYearException;
 use App\ValueObject\Publishing;
 use PHPUnit\Framework\TestCase;
 
@@ -28,7 +28,7 @@ class PublishingTest extends TestCase
      */
     public function testIncorrectYearWillThrow($year)
     {
-        $this->expectException(ParsePublishingYearException::class);
+        $this->expectException(InvalidYearException::class);
         Publishing::fromScalar($year);
     }
 

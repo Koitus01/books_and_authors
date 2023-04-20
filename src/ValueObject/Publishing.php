@@ -2,7 +2,7 @@
 
 namespace App\ValueObject;
 
-use App\Exceptions\ParsePublishingYearException;
+use App\Exceptions\InvalidYearException;
 use DateTime;
 use DateTimeInterface;
 use Exception;
@@ -18,7 +18,7 @@ class Publishing
 
     /**
      * @param string|int $year — standard year, beginning from 1000
-     * @throws ParsePublishingYearException
+     * @throws InvalidYearException
      */
     public static function fromScalar(string|int $year): self
     {
@@ -28,7 +28,7 @@ class Publishing
                 throw new Exception();
             }
         } catch (Exception $exception) {
-            throw new ParsePublishingYearException("Cannot properly parse year $year");
+            throw new InvalidYearException("Cannot properly parse year $year");
         }
 
         return new self($publishing);

@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 
-class ParsePublishingYearException extends Exception
+class InvalidYearException extends Exception
 {
 
 }

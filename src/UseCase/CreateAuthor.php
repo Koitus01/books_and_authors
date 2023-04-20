@@ -5,6 +5,7 @@ namespace App\UseCase;
 use App\DTO\AuthorDTO;
 use App\Entity\Author;
 use App\Entity\Book;
+use App\Repository\AuthorRepository;
 use Doctrine\ORM\EntityNotFoundException;
 
 /**
@@ -19,6 +20,7 @@ class CreateAuthor extends BaseUseCase
      */
     public function execute(AuthorDTO $DTO, array $books = []): Author
     {
+        /** @var AuthorRepository $authorRepository */
         $authorRepository = $this->entityManager->getRepository(Author::class);
         try {
             return $authorRepository->findOneByName($DTO);

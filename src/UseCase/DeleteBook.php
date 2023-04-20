@@ -3,6 +3,7 @@
 namespace App\UseCase;
 
 use App\Entity\Book;
+use App\Repository\BookRepository;
 use Doctrine\ORM\EntityNotFoundException;
 
 class DeleteBook extends BaseUseCase
@@ -12,6 +13,7 @@ class DeleteBook extends BaseUseCase
      */
     public function execute(int $id): Book
     {
+        /** @var BookRepository $repository */
         $repository = $this->entityManager->getRepository(Book::class);
         $book = $repository->findOrThrow($id);
 

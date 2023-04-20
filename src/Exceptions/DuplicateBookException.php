@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
-class DuplicateBookException extends \Exception
+use Exception;
+
+class DuplicateBookException extends Exception
 {
     public const SAME_ISBN_ERROR = 'Book with same ISBN and title already exists';
     public const SAME_PUBLISHING_ERROR = 'Book with same publishing date and title already exists';
