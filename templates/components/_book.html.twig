@@ -13,7 +13,7 @@
     <div class="authors">
         <span>Авторы:</span>
         {% for author in book.authors %}
-            <span>ФИО: {{ author.getSecondName ~ ' ' ~ author.getFirstName ~ ' ' ~ author.getThirdName }}</span>
+            <a href="{{ path('author_show', {id: author.id}) }}">ФИО: {{ author.getSecondName ~ ' ' ~ author.getFirstName ~ ' ' ~ author.getThirdName }}</a>
         {% endfor %}
     </div>
     {% endif %}

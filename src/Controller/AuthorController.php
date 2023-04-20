@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\AuthorDTO;
-use App\Form\AuthorType;
+use App\Form\AuthorFormType;
 use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
 use App\UseCase\CreateAuthor;
@@ -11,8 +11,6 @@ use App\UseCase\UpdateAuthor;
 use App\UseCase\DeleteAuthor;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,18 +33,18 @@ class AuthorController extends AbstractController
         BookRepository $bookRepository
     ): RedirectResponse|Response
     {
-        $form = $this->form();
+        $form = $this->createForm(AuthorFormType::class);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
-            $books = $bookRepository->findByIds($data['books_ids']);
             $authorDTO = new AuthorDTO(
-                $data['first_name'],
-                $data['second_name'],
-                $data['third_name']
+                $data['name']['first_name'],
+                $data['name']['second_name'],
+                $data['name']['third_name']
             );
+            $books = $data['books_ids'] ? $bookRepository->findByIds($data['books_ids']) : [];
             $result = $createAuthor->execute($authorDTO, $books);
 
             return $this->redirectToRoute('author_show', ['id' => $result->getId()]);
@@ -66,9 +64,9 @@ class AuthorController extends AbstractController
     #[Route('/author/{id}/delete', name: 'author_delete')]
     public function delete(DeleteAuthor $deleteAuthor, int $id): Response
     {
-        $book = $deleteAuthor->execute($id);
+        $author = $deleteAuthor->execute($id);
 
-        return $this->render('author_deleted.html.twig', ['book' => $book]);
+        return $this->render('author_deleted.html.twig', ['author' => $author]);
     }
 
     /**
@@ -76,30 +74,34 @@ class AuthorController extends AbstractController
      * @param UpdateAuthor $updateAuthor
      * @param int $id
      * @param BookRepository $bookRepository
+     * @param AuthorRepository $authorRepository
      * @return RedirectResponse|Response
      * @throws EntityNotFoundException
      */
     #[Route('/author/{id}/edit', name: 'author_edit')]
     public function edit(
-        Request        $request,
-        UpdateAuthor   $updateAuthor,
-        int            $id,
-        BookRepository $bookRepository
+        Request          $request,
+        UpdateAuthor     $updateAuthor,
+        int              $id,
+        BookRepository   $bookRepository,
+        AuthorRepository $authorRepository
     ): RedirectResponse|Response
     {
-        $form = $this->form();
+        $form = $this->createForm(AuthorFormType::class, options: [
+            'required' => false
+        ]);
+        $author = $authorRepository->find($id);
 
         $form->handleRequest($request);
-        $data = $form->getData();
-        if ($form->isSubmitted() && $form->isValid() && array_filter($data)) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
-            $books = $bookRepository->findByIds($data['books_ids']);
             $authorDTO = new AuthorDTO(
-                $data['first_name'],
-                $data['second_name'],
-                $data['third_name']
+                $data['name']['first_name'] ?? $author->getFirstName(),
+                $data['name']['second_name'] ?? $author->getSecondName(),
+                $data['name']['third_name'] ?? null
             );
+            $books = $data['books_ids'] ? $bookRepository->findByIds($data['books_ids']) : [];
             $result = $updateAuthor->execute($id, $authorDTO, $books);
 
             return $this->redirectToRoute('author_show', ['id' => $result->getId()]);
@@ -107,6 +109,7 @@ class AuthorController extends AbstractController
 
         return $this->render('author_edit.html.twig', [
             'form' => $form,
+            'author' => $author
         ]);
     }
 
@@ -120,7 +123,7 @@ class AuthorController extends AbstractController
     public function show(AuthorRepository $repository, int $id): Response
     {
         return $this->render('author_show.html.twig', [
-            'book' => $repository->findOrThrow($id)
+            'author' => $repository->findOrThrow($id)
         ]);
     }
 
@@ -131,19 +134,8 @@ class AuthorController extends AbstractController
     #[Route('/authors', name: 'authors')]
     public function showAll(AuthorRepository $repository): Response
     {
-        return $this->render('author_show.html.twig', [
-            'book' => $repository->findAll()
+        return $this->render('authors.html.twig', [
+            'authors' => $repository->findAll()
         ]);
-    }
-
-    private function form(): FormInterface
-    {
-        return $this->createForm(AuthorType::class)
-            ->add('books_ids', TextType::class, [
-                'Идентификаторы книг через запятую' // sorry
-            ])
-            ->add('save', options: [
-                'label' => 'Сохранить'
-            ]);
     }
 }

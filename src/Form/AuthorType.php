@@ -13,15 +13,15 @@ class AuthorType extends AbstractType
     {
         $builder
             ->add('second_name', TextType::class, [
-                'attr' => ['placeholder' => 'Фамилия'],
+                'attr' => ['placeholder' => 'Достоевский'],
                 'label' => 'Фамилия'
             ])
             ->add('first_name', TextType::class, [
-                'attr' => ['placeholder' => 'Имя'],
+                'attr' => ['placeholder' => 'Федор'],
                 'label' => 'Имя'
             ])
             ->add('third_name', TextType::class, [
-                'attr' => ['placeholder' => 'Отчество'],
+                'attr' => ['placeholder' => 'Михайлович'],
                 'required' => false,
                 'label' => 'Отчество (необязательно)'
             ]);

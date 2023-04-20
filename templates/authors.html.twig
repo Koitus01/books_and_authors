@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="author-list">
+        {% if authors|length > 0 %}
+            {% for author in authors %}
+                {% include 'components/_author.html.twig' with {author: author} only %}
+                <p>_____________________________________________</p>
+                <br>
+            {% endfor %}
+        {% else %}
+            <span style="margin-bottom: 15px">Нет Авторов</span>
+            <a href="{{ path('author_new') }}">Создать</a>
+        {% endif %}
+    </div>
+
+    <style>
+        .author-list {
+            display: flex;
+            flex-direction: column;
+            max-width: fit-content;
+            margin: auto
+        }
+    </style>
+{% endblock %}

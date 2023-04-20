@@ -79,7 +79,7 @@ class BookRepository extends ServiceEntityRepository
     {
         $entities = [];
         foreach ($ids as $id) {
-             $entities = $this->findOrThrow($id);
+             $entities[] = $this->findOrThrow($id);
         }
 
         return $entities;
