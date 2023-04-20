@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Exceptions\InvalidCoverException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 
 class SaveCover
@@ -17,14 +18,18 @@ class SaveCover
         'jpg',
         'jpeg'
     ];
+    protected string $filePath = '';
+
+    public function __construct(private readonly Filesystem $filesystem, private readonly string $coverPath)
+    {
+    }
 
     /**
      * @param File $file
-     * @param string $storePath
      * @return string
      * @throws InvalidCoverException
      */
-    public function execute(File $file, string $storePath): string
+    public function execute(File $file): string
     {
         if (!exif_imagetype($file->openFile()->getPathname())) {
             throw new InvalidCoverException('Cover is not an image');
@@ -35,9 +40,17 @@ class SaveCover
         }
 
         $fileName = 'image_' . date('Y-m-d-H-i-s') . '_' . uniqid() . '.' . $file->guessExtension();
-        $file->move($storePath, $fileName);
+        $file->move($this->coverPath, $fileName);
 
+        $this->filePath = $this->coverPath . $fileName;
         return $fileName;
+    }
+
+    public function rollback(): void
+    {
+        if ($this->filesystem->exists($this->filePath)) {
+            $this->filesystem->remove($this->filePath);
+        }
     }
 
 }

@@ -7,18 +7,22 @@
     <span>Год публикации: {{ book.publishing }}</span>
     <span>Количество страниц: {{ book.getPagesCount }}</span>
     <span>ISBN: {{ book.isbn }}</span>
+    {% if book.authors|length > 0 %}
     <div class="authors">
         <span>Авторы:</span>
         {% for author in book.authors %}
             <span>{{ author.getSecondName ~ ' ' ~ author.getFirstName ~ ' ' ~ author.getThirdName }}</span>
         {% endfor %}
     </div>
+    {% endif %}
+    {% if hide_links is not defined %}
     <div class="links">
         <a class="links__delete" onclick="if (confirm('Подтверждаете удаление?')) {
                 window.open('{{ path('book_delete', {id: book.id}) }}');
-                }">Удалить (без предупреждения)</a>
+                }">Удалить</a>
         <a class="links__edit" href="{{ path('book_edit', {id: book.id}) }}">Отредактировать</a>
     </div>
+    {% endif %}
 </div>
 
 <style>

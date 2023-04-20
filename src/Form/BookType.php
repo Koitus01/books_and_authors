@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\DTO\AuthorDTO;
 use App\Entity\Author;
 use App\ValueObject\Publishing;
 use Symfony\Component\Form\AbstractType;
@@ -47,44 +48,38 @@ class BookType extends AbstractType
                 'attr' => ['accept' => 'image/png, image/jpeg']
             ])
             ->add('add_author', ButtonType::class, [
-                'attr' => ['class' => 'add_item_link']
+                'attr' => ['class' => 'add_item_link'],
             ])
             ->add('authors', CollectionType::class, [
                 'entry_type' => AuthorType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
                 'delete_empty' => true,
-                'label' => 'Авторы. Создадутся, если их еще нет',
+                'label' => 'Авторы создадутся, если их еще нет',
                 'row_attr' => ['class' => 'authors', 'id' => 'authors'],
                 'entry_options' => [
                     'attr' => ['placeholder' => 'ФИО'],
-                    'data_class' => Author::class,
-                    'label' => false,
-                    #'disabled' => true
+                    'label' => false
                 ]
             ])
             ->add('save', SubmitType::class);
 
-        $builder->get('publishing')->addModelTransformer(new CallbackTransformer(
-            function ($publishingAsObject) {
+        $builder->get('authors')->addModelTransformer(new CallbackTransformer(
+            function ($authors) {
+                return $authors;
                 if (!$publishingAsObject) {
                     return null;
                 }
                 return (int)$publishingAsObject->value()->format('Y');
             },
-            function ($publishingAsInt) {
-                return Publishing::fromScalar($publishingAsInt);
-            }
-        ));
-        $builder->get('cover')->addModelTransformer(new CallbackTransformer(
-            function ($file) {
-                if (!$file) {
-                    return null;
-                }
-                return new UploadedFile($this->coverPath . $file, $file);
-            },
-            function ($file) {
-                return $file;
+            function ($authors) {
+                return array_map(function ($author) {
+                    return new AuthorDTO(
+                        $author['first_name'],
+                        $author['second_name'],
+                        $author['third_name']
+                    );
+                }, array_filter($authors));
             }
         ));
     }

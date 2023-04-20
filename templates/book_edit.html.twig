@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="center">
+        {% include 'components/_book.html.twig' with {hide_links: true} %}
+        <span style="margin: 15px 0">Редактирование книги</span>
+        {% include 'components/_create_form.html.twig' %}
+    </div>
+
+{% endblock %}

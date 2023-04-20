@@ -34,4 +34,19 @@ class CreateAuthor extends BaseUseCase
         return $author;
     }
 
+    /**
+     * @param array<AuthorDTO> $authors
+     * @return array<Author>
+     * @throws EntityNotFoundException
+     */
+    public function executeMany(array $authors): array
+    {
+        $result = [];
+        foreach ($authors as $author) {
+            $result[] = $this->execute($author);
+        }
+
+        return $result;
+    }
+
 }

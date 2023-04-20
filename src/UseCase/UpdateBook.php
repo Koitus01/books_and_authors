@@ -8,10 +8,24 @@ use App\Entity\Book;
 use App\Exceptions\DuplicateBookException;
 use App\Repository\BookRepository;
 use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\EntityManagerInterface;
 use Throwable;
 
 class UpdateBook extends BaseUseCase
 {
+    protected CreateAuthor $createAuthor;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param CreateAuthor $createAuthor
+     */
+    public function __construct(EntityManagerInterface $entityManager, CreateAuthor $createAuthor)
+    {
+        $this->createAuthor = $createAuthor;
+        parent::__construct($entityManager);
+    }
+
+
     /**
      * @param UpdateBookDTO $DTO
      * @return Book
@@ -67,6 +81,10 @@ class UpdateBook extends BaseUseCase
             $this->entityManager->rollback();
             throw $e;
         }
+    }
+
+    private function addAuthors()
+    {
 
     }
 }

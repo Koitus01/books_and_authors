@@ -12,6 +12,7 @@ use App\Exceptions\ParsePublishingYearException;
 use App\Form\BookType;
 use App\Repository\BookRepository;
 use App\Service\SaveCover;
+use App\UseCase\CreateAuthor;
 use App\UseCase\CreateBook;
 use App\UseCase\DeleteBook;
 use App\UseCase\UpdateBook;
@@ -22,26 +23,34 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BookController extends AbstractController
 {
-
     /**
-     * TODO: rollback cover saving and redirect to created book
-     * @throws ParsePublishingYearException
-     * @throws InvalidCoverException
+     * @param Request $request
+     * @param CreateBook $createBook
+     * @param SaveCover $fileSave
+     * @param CreateAuthor $createAuthor
+     * @param EntityManagerInterface $entityManager
+     * @return RedirectResponse|Response
      * @throws DuplicateBookException
+     * @throws EntityNotFoundException
+     * @throws InvalidCoverException
      * @throws InvalidISBNException
+     * @throws ParsePublishingYearException
+     * @throws \Throwable
      */
     #[Route('/book/new', name: 'book_new')]
     public function new(
         Request                $request,
         CreateBook             $createBook,
         SaveCover              $fileSave,
-        EntityManagerInterface $manager,
+        CreateAuthor           $createAuthor,
+        EntityManagerInterface $entityManager
     )
     {
         $form = $this->createForm(BookType::class, options: [
@@ -51,28 +60,28 @@ class BookController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            // Move save in CreateBook???
-            $cover = $data['cover'] ?
-                $fileSave->execute($data['cover'], $this->getParameter('app.cover_path')) :
-                null;
-            $authors = array_map(function ($author) use ($manager) {
-                return new AuthorDTO(
-                    $author['first_name'],
-                    $author['second_name'],
-                    $author['third_name']
-                );
-            }, array_filter($data['authors']));
-            $createBookDTO = new CreateBookDTO(
-                $data['title'],
-                Publishing::fromScalar($data['publishing']),
-                ISBN::fromString($data['isbn']),
-                new ArrayCollection($authors),
-                $data['pages_count'],
-                $cover
-            );
-            $result = $createBook->execute($createBookDTO);
+            $entityManager->beginTransaction();
+            try {
+                $cover = $data['cover'] ? $fileSave->execute($data['cover']) : null;
 
-            return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
+                $authors = $createAuthor->executeMany($data['authors']);
+
+                $createBookDTO = new CreateBookDTO(
+                    $data['title'],
+                    Publishing::fromScalar($data['publishing']),
+                    ISBN::fromString($data['isbn']),
+                    $data['pages_count'],
+                    $cover
+                );
+                $result = $createBook->execute($createBookDTO, $authors);
+
+                $entityManager->commit();
+                return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
+            } catch (\Throwable $e) {
+                $entityManager->rollback();
+                $fileSave->rollback();
+                throw $e;
+            }
         }
 
         return $this->render('book_new.html.twig', [
@@ -105,36 +114,36 @@ class BookController extends AbstractController
      */
     #[Route('/book/{id}/edit', name: 'book_edit')]
     public function edit(
-        Request                $request,
-        UpdateBook             $updateBook,
-        int                    $id,
-        BookRepository         $repository,
-        EntityManagerInterface $manager
+        Request        $request,
+        UpdateBook     $updateBook,
+        int            $id,
+        BookRepository $repository
     )
     {
         $book = $repository->findOrThrow($id);
-        $form = $this->createForm(BookType::class, $book, options: [
-            'method' => 'post'
+        $form = $this->createForm(BookType::class, options: [
+            'method' => 'post',
+            'attr' => ['class' => 'center'],
+            'required' => false
         ]);
 
         $form->handleRequest($request);
         $data = $form->getData();
-        /** @var \App\Entity\Book $oldBook */
-        $oldBook = $manager->getUnitOfWork()->getOriginalEntityData($book);
-        if ($form->isSubmitted() && $form->isValid() && $oldBook !== $data) {
-            $newISBN = ISBN::fromString($data->getIsbn());
+        if ($form->isSubmitted() && $form->isValid() && array_filter($data)) {
             $updateBookDTO = new UpdateBookDTO(
-                $data->getId(),
-                $oldBook['title'] !== $data->getTitle() ? $data->getTitle() : null,
-                $oldBook['publishing'] != $data->getPublishing() ? $data->getPublishing() : null,
-                $oldBook['isbn'] != $newISBN ? $newISBN : null,
-                $oldBook['authors'] != $data->getAuthors() ? $data->getAuthors() : null
+                $id,
+                $data['title'],
+                $data['publishing'],
+                $data['isbn'],
+                new ArrayCollection($data['authors'])
             );
             $result = $updateBook->execute($updateBookDTO);
+            return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
         }
 
-        return $this->render('book_new.html.twig', [
+        return $this->render('book_edit.html.twig', [
             'form' => $form,
+            'book' => $book
         ]);
     }
 
