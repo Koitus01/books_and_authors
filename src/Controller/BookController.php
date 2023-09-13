@@ -61,21 +61,22 @@ class BookController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+            
+            $cover = $data['cover'] ? $fileSave->execute($data['cover']) : null;
+
+            $authors = $createAuthor->executeMany($data['authors']);
+
+            $createBookDTO = new CreateBookDTO(
+                $data['title'],
+                Publishing::fromScalar($data['publishing']),
+                ISBN::fromString($data['isbn']),
+                $data['pages_count'],
+                $cover
+            );
+            
             $entityManager->beginTransaction();
             try {
-                $cover = $data['cover'] ? $fileSave->execute($data['cover']) : null;
-
-                $authors = $createAuthor->executeMany($data['authors']);
-
-                $createBookDTO = new CreateBookDTO(
-                    $data['title'],
-                    Publishing::fromScalar($data['publishing']),
-                    ISBN::fromString($data['isbn']),
-                    $data['pages_count'],
-                    $cover
-                );
                 $result = $createBook->execute($createBookDTO, $authors);
-
                 $entityManager->commit();
                 return $this->redirectToRoute('book_show', ['id' => $result->getId()]);
             } catch (Throwable $e) {
